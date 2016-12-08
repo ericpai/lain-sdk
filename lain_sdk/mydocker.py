@@ -99,7 +99,13 @@ def gen_dockerignore(path, ignore):
 
 def build_image(name, context):
     info('building image {} ...'.format(name))
-    docker_args = ['build', '-t', name, '.']
+
+    proxy = os.environ.get('docker_http_proxy')
+    if proxy:
+        docker_args = ['build', '--build-arg', 'https_proxy=%s' % proxy, '--build-arg', 'http_proxy=%s' % proxy, '-t', name, '.']
+    else:
+        docker_args = ['build', '-t', name, '.']
+
     retcode = _docker(docker_args, cwd=context)
     if retcode != 0:
         name = None
