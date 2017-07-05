@@ -101,6 +101,12 @@ def gen_dockerignore(path, ignore):
 def build_image(name, context, build_args):
     info('building image {} ...'.format(name))
     docker_args = ['build', '-t', name, '.']
+
+    if 'docker_http_proxy' in os.environ:
+        build_args = [
+            'http_proxy=$docker_http_proxy', 'https_proxy=$docker_http_proxy'
+        ]
+
     if build_args:
         docker_args = ['build', '-t', name]
         for arg in build_args:
