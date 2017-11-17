@@ -8,7 +8,7 @@ requirements = [
     'enum34==1.0.4',
     'requests>=2.6.1',
     'websocket-client==0.32.0',
-    'docker==2.1.0',
+    'docker==2.6.1',
     'pytest',
     'mock==1.0.1',
     'jsonschema==2.5.1',
