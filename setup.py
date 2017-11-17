@@ -16,7 +16,7 @@ requirements = [
 
 
 setup(
-    name="lain_sdk",
+    name="einplus_lain_sdk",
     version=__version__,
     packages=find_packages(),
     include_package_data=True,
