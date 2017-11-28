@@ -332,7 +332,7 @@ def get_tag_list_in_registry(registry, appname):
 
 def get_tag_list_in_docker_daemon(registry, appname):
     tag_list = []
-    c = docker.from_env()
+    c = docker.from_env(version='auto')
     imgs = c.images.list()
     for img in imgs:
         repo_tags = img.tags
@@ -352,7 +352,7 @@ def get_tag_list_in_docker_daemon(registry, appname):
 
 def get_tag_list_using_by_containers(registry, appname):
     tag_list = []
-    c = docker.from_env()
+    c = docker.from_env(version='auto')
     containers = c.containers.list()
     for container in containers:
         repo, tag = container.attrs['Config']['Image'].split(":")
