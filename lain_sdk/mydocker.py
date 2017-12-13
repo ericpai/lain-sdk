@@ -171,7 +171,7 @@ def copy_to_host(image_name, docker_path, host_path, directory=False):
         cp = ['cp', '-r']
     else:
         cp = ['cp']
-    inter_host_dir = tempfile.mkdtemp()
+    inter_host_dir = tempfile.mkdtemp(dir='/tmp')
     inter_dock_dir = '/lain_share'
     docker_args = ['run', '--rm', '-v',
                    '{}:{}'.format(inter_host_dir, inter_dock_dir), image_name]
@@ -258,7 +258,7 @@ def proc_rm(container_name, host_volume_base):
     info('rm proc instance {}'.format(container_name))
     _docker(['rm', '-v', container_name])
     info('rm proc instance volume at host: {}'.format(host_volume_base))
-    subprocess.call(['sudo', 'rm', '-rf', host_volume_base])  # FIXME
+    subprocess.call(['rm', '-rf', host_volume_base])
 
 
 def inspect(container_name):

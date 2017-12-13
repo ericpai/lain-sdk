@@ -146,7 +146,7 @@ class Ports:
         self.ports = []
         self.src_port = []
         if isinstance(meta, str):
-            src_port, dst_port, proto = self.parse(m)
+            src_port, dst_port, proto = self.parse(meta)
             port_mapping = {'srcport': src_port,
                             'dstport': dst_port, 'proto': proto}
             self.ports = [port_mapping]
@@ -234,8 +234,8 @@ class Proc:
     name = ''
     type = ProcType.worker
     image = ''
-    entrypoint = ''
-    cmd = ''
+    entrypoint = None
+    cmd = None
     num_instances = 1
     cpu = 0
     memory = '32m'
@@ -253,6 +253,7 @@ class Proc:
     system_volumes = []
     cloud_volumes = {}
     secret_files = []  # for proc
+    secret_files_bypass = False
     service_name = ''
     allow_clients = ''
     backup = []
@@ -278,11 +279,10 @@ class Proc:
         if len(proc_info) == 1:
             self.name = proc_info[0]
             self.type = ProcType[proc_info[0]]  # 放弃meta里面的type定义
+
         self.image = meta.get('image', default_image_name)
-        meta_entrypoint = meta.get('entrypoint')
-        self.entrypoint = self.__to_exec_form(meta_entrypoint)
-        meta_cmd = meta.get('cmd')
-        self.cmd = self.__to_exec_form(meta_cmd)
+        self.entrypoint = self.__get_entrypoint(meta)
+        self.cmd = self.__get_cmd(meta)
         self.user = meta.get('user', '')
         self.working_dir = meta.get('workdir') or meta.get('working_dir', '')
         dns_search_meta = meta.get('dns_search', [])
@@ -418,8 +418,8 @@ class Proc:
                     "Log in Logs section MUST be a relative path based on /lain/logs. Wrong path: %s" % (log))
             if log not in self.logs:
                 self.logs.append(log)
-        if logs_meta:
-            self.volumes.append('/lain/logs')
+
+        self.volumes.append('/lain/logs') # mount /lain/logs by default for stdout/stderr
 
         # add default system volume
         self.system_volumes = DEFAULT_SYSTEM_VOLUMES
@@ -430,6 +430,7 @@ class Proc:
         self.secret_files = meta.get('secret_files') or []
         # add /lain/app for relative paths
         self.secret_files = parse_path(self.secret_files)
+        self.secret_files_bypass = meta.get('secret_files_bypass') or False
 
         # ProcType.portal 的 proc 有 service_name 和 allow_clients
         if self.type == ProcType.portal:
@@ -504,13 +505,23 @@ class Proc:
     def __to_exec_form(self, command_and_params):
         """ 将 shell form(空格分隔) 转变为 exec form(string list)，或者保持 exec form 的格式
         """
-        if isinstance(command_and_params, basestring):
+        if command_and_params is None:
+            return None
+        elif isinstance(command_and_params, basestring):
             command_and_params_list = command_and_params.split()
         elif isinstance(command_and_params, list) and all(isinstance(item, basestring) for item in command_and_params):
             command_and_params_list = command_and_params
         else:   # None 或者非法输入，如果是非法输入，在 lain build 时会给出警告
             command_and_params_list = []
         return command_and_params_list
+
+    def __get_entrypoint(self, meta):
+        meta_entrypoint = self.__to_exec_form(meta.get('entrypoint', None))
+        return meta_entrypoint
+
+    def __get_cmd(self, meta):
+        meta_cmd = self.__to_exec_form(meta.get('cmd', None))
+        return meta_cmd
 
     @property
     def annotation(self):
@@ -631,8 +642,9 @@ class LainConf:
         if self.appname in INVALID_APPNAMES:
             raise Exception('invalid lain conf: appname {} should not in {}'.format(
                 self.appname, INVALID_APPNAMES))
-        self.procs = self._load_procs(meta, self.appname, meta_version, default_image, registry=cluster_config.get(
-            'registry', PRIVATE_REGISTRY), domains=cluster_config.get('domains', [DOMAIN]))
+        self.procs = self._load_procs(meta, self.appname, meta_version, default_image,
+                                      registry=cluster_config.get('registry', PRIVATE_REGISTRY),
+                                      domains=cluster_config.get('domains', [DOMAIN]))
         self.build = self._load_build(meta)
         self.release = self._load_release(meta)
         self.test = self._load_test(meta)
@@ -651,8 +663,9 @@ class LainConf:
 
         def _proc_load(key, meta, **cluster_config):
             _proc = Proc()
-            _proc.load(key, meta, appname, meta_version, default_image, registry=cluster_config.get(
-                'registry', PRIVATE_REGISTRY), domains=cluster_config.get('domains', [DOMAIN]))
+            _proc.load(key, meta, appname, meta_version, default_image,
+                       registry=cluster_config.get('registry', PRIVATE_REGISTRY),
+                       domains=cluster_config.get('domains', [DOMAIN]))
 
             # TODO 更多错误校验
             if _proc.name in _procs.keys():

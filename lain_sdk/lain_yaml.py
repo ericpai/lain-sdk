@@ -280,8 +280,8 @@ class LainYaml(object):
             return (False, None)
 
         try:
-            host_release_tar = tempfile.NamedTemporaryFile(delete=False).name
-            untar = tempfile.mkdtemp()
+            host_release_tar = tempfile.NamedTemporaryFile(dir='/tmp',delete=False).name
+            untar = tempfile.mkdtemp(dir='/tmp')
 
             mydocker.copy_to_host(copy_inter_name, p.join(
                 DOCKER_APP_ROOT, release_tar), host_release_tar)
@@ -323,12 +323,7 @@ class LainYaml(object):
             'scripts': self.test.script
         }
         test_name = self.img_builders['test'](context=self.ctx, params=params, build_args=[])
-        if test_name is None:
-            last_container_id = mydocker.get_latest_container_id()
-            if last_container_id != -1:
-                # for lain enter-test, tricky, ugly, but works!
-                mydocker.commit(last_container_id, self.img_names['test'])
-
+      
         if test_name is None:
             error("Tests Fail")
             return (False, None)
