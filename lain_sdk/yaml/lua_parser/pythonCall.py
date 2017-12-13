@@ -1,3 +1,4 @@
+from __future__ import print_function
 import lupa
 from lupa import LuaRuntime
 lua = LuaRuntime(unpack_returned_tuples=True)
@@ -12,7 +13,7 @@ comd += "fileName = " + "'" + fileName + "'\n"
 comd += "repo_name = " + "'" + repo_name + "'\n"
 comd += "meta_version = " + "'" + meta_version + "'\n"
 
-print comd
+print(comd)
 
 # lua.eval("dostring("+comd+")")
 
@@ -24,5 +25,5 @@ fo.close()
 lua.eval("dofile('jsonForPY.lua')")
 a = lua.eval("dofile('jsonCompletion.lua')")
 
-print a['appname']
-print a['procs']['bar']['port']['port']
+print(a['appname'])
+print(a['procs']['bar']['port']['port'])

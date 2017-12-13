@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import print_function
 import json
 import yaml
 import pytest
@@ -1622,7 +1622,7 @@ class LainConfTests(TestCase):
         assert echoclient_conf.appname == 'hello'
         assert echoclient_conf.procs['web'].cloud_volumes.get(
             'multi') == ['/data', '/var/lib/mysql']
-        print echoclient_conf.procs['web'].cloud_volumes
+        print(echoclient_conf.procs['web'].cloud_volumes)
 
     def test_lain_conf_cloud_volumes_single_type(self):
         meta_yaml = '''
@@ -1661,7 +1661,7 @@ class LainConfTests(TestCase):
         assert echoclient_conf.procs['web'].cloud_volumes.get('multi') == None
         assert echoclient_conf.procs['web'].cloud_volumes.get(
             'single') == ['/data', '/var/lib/mysql']
-        print echoclient_conf.procs['web'].cloud_volumes
+        print(echoclient_conf.procs['web'].cloud_volumes)
 
     def test_lain_conf_volume_backup(self):
         meta_yaml = '''

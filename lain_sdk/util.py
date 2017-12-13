@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from __future__ import print_function
 import logging
 import os
 import copy
@@ -22,6 +22,7 @@ def _colorize(code):
             c = '1;%s' % c
         return '\033[%sm%s\033[0m' % (c, text)
     return _
+
 
 _red = _colorize('31')
 _green = _colorize('32')
@@ -52,7 +53,7 @@ log = logging
 
 def recur_create_file(path):
     if os.path.exists(path):
-        print >> stderr, "Error: {} already exists".format(path)
+        print("Error: {} already exists".format(path), file=stderr)
         exit(1)
     par_dir = os.path.dirname(path)
     if not os.path.exists(par_dir):
