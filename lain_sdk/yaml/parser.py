@@ -7,6 +7,7 @@ from jinja2 import Template
 import json
 import copy
 import os
+from six import iteritems
 from enum import Enum
 from os.path import abspath
 
@@ -388,7 +389,7 @@ class Proc:
                     continue
                 key = volume.keys()[0]  # there's only one key in this dict
 
-                for attr, setting in volume[key].iteritems():
+                for (attr, setting) in iteritems(volume[key]):
                     if attr == "backup_full" or attr == "backup_increment":
                         schedule, expire = setting.get(
                             'schedule', ""), setting.get('expire', "")
@@ -703,7 +704,7 @@ class LainConf:
         if isinstance(meta, dict):
             use_resources = {}
             try:
-                for k, v in meta.iteritems():
+                for (k, v) in iteritems(meta):
                     tmp_v = copy.deepcopy(v)
                     use_resources[k] = {'services': tmp_v.pop('services')}
                     use_resources[k]['context'] = tmp_v

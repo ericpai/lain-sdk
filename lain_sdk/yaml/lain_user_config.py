@@ -4,6 +4,7 @@
 import os
 import yaml
 import stat
+from six import iteritems
 
 
 LAIN_USER_CONFIG_FILE_NAME = "lain.conf.yaml"
@@ -54,10 +55,10 @@ class LainUserConfig:
 
     def set_config(self, **kwargs):
         _config = self.get_config_from(self.user_config_file)
-        for key, values in kwargs.iteritems():
+        for (key, values) in iteritems(kwargs):
             if not _config.has_key(key):
                 _config[key] = {}
-            for k, v in values.iteritems():
+            for (k, v) in iteritems(values):
                 _config[key][k] = v
         self.save_config(_config)
         return _config
@@ -70,7 +71,7 @@ class LainUserConfig:
 
     def set_global_config(self, **kwargs):
         _config = self.get_config_from(self.user_global_config_file)
-        for key, value in kwargs.iteritems():
+        for (key, value) in iteritems(kwargs):
             _config[key] = value
         self.save_global_config(_config)
         return _config
@@ -84,16 +85,16 @@ class LainUserConfig:
         _config = LainUserConfig.get_config_from(
             LainUserConfig.global_config_file)
         user_global_config = self.get_config_from(self.user_global_config_file)
-        for k, v in user_global_config.iteritems():
+        for (k, v) in iteritems(user_global_config):
             _config[k] = v
         user_config = self.get_config_from(self.user_config_file)
-        for k, v in user_config.iteritems():
+        for (k, v) in iteritems(user_config):
             _config[k] = v
         return _config
 
     def get_available_phases(self):
         phases = []
         user_config = self.get_config_from(self.user_config_file)
-        for k, _ in user_config.iteritems():
+        for (k, _) in iteritems(user_config):
             phases.append(k)
         return phases

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from six import iteritems
 import logging
 import os
 import copy
@@ -170,7 +171,7 @@ def lain_based_path(path, base='/lain/app'):
 
 def get_phase_config_from_registry(registry):
     etc = user_config.get_config()
-    for k, v in etc.iteritems():
+    for (k, v) in iteritems(etc):
         if isinstance(v, dict):
             if registry == "registry.{}".format(v.get('domain', '')):
                 return k, copy.deepcopy(v)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from six import iteritems
 import os
 import shutil
 import tempfile
@@ -237,7 +238,7 @@ def proc_run(container_name, image, working_dir, port, cmd, envs, volumes):
     env_opt = sum([['-e', env] for env in envs], [])
     volume_opt = sum([
         ['-v', '{}:{}'.format(k, v)]
-        for k, v in volumes.iteritems()
+        for (k, v) in iteritems(volumes)
     ], [])
     docker_args = ['run', '-d', '--name={}'.format(container_name)] \
         + working_dir_opt + port_opt + env_opt + volume_opt + [image] + cmd
