@@ -48,7 +48,7 @@ def _docker(args, cwd=None, env=os.environ, capture_output=False, print_stdout=T
                 cmd, env=env, cwd=cwd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             output = e.output
-        return output
+        return output.decode()
     else:
         retcode = subprocess.call(cmd, env=env, cwd=cwd, stderr=subprocess.STDOUT,
                                   stdout=(None if print_stdout else open('/dev/null', 'w')))

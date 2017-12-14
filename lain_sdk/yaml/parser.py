@@ -221,7 +221,7 @@ class Port:
             else:
                 raise Exception('not supported port desc %s' % (meta, ))
         elif isinstance(meta, dict):
-            self.port = meta.keys()[0]
+            self.port = list(meta.keys())[0]
             _pi = meta.values()[0][0].split(':')
             assert _pi[0] == 'type'
             self.type = SocketType[_pi[1]]
@@ -388,7 +388,7 @@ class Proc:
             elif isinstance(volume, dict):
                 if len(volume) == 0:
                     continue
-                key = volume.keys()[0]  # there's only one key in this dict
+                key = list(volume.keys())[0]  # there's only one key in this dict
 
                 for (attr, setting) in iteritems(volume[key]):
                     if attr == "backup_full" or attr == "backup_increment":
