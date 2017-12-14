@@ -97,13 +97,13 @@ class LainYaml(object):
         # 两处都没有合适的 image name 则返回 None
         remote_images = self._get_prepare_shared_image_names(True).items()
         if remote_images:
-            remote_latest = remote_images[0]
+            remote_latest = list(remote_images)[0]
         else:
             remote_latest = None
 
         local_images = self._get_prepare_shared_image_names(False).items()
         if local_images:
-            local_latest = local_images[0]
+            local_latest = list(local_images)[0]
         else:
             local_latest = None
 
