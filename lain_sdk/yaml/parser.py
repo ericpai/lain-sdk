@@ -10,6 +10,7 @@ import os
 from six import iteritems
 from enum import Enum
 from os.path import abspath
+from past.builtins import basestring
 
 from ..mydocker import gen_image_name
 from .conf import PRIVATE_REGISTRY, DOMAIN, DOCKER_APP_ROOT
