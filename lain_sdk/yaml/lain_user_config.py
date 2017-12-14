@@ -56,7 +56,7 @@ class LainUserConfig:
     def set_config(self, **kwargs):
         _config = self.get_config_from(self.user_config_file)
         for (key, values) in iteritems(kwargs):
-            if not _config.has_key(key):
+            if key not in _config:
                 _config[key] = {}
             for (k, v) in iteritems(values):
                 _config[key][k] = v

@@ -1904,7 +1904,7 @@ def test_resource_instance_meta_render_abbreviation():
         registry, resource_appname, resource_meta_version
     )
     resource_instance_yaml = yaml.safe_load(resource_instance_meta)
-    assert not resource_instance_yaml.has_key('apptye')
+    assert 'apptype' not in resource_instance_yaml
     resource_instance_config = LainConf()
     resource_instance_config.load(resource_instance_meta,
                                   resource_meta_version,
@@ -1941,7 +1941,7 @@ def test_resource_instance_meta_render_full():
         registry, resource_appname, resource_meta_version
     )
     resource_instance_yaml = yaml.safe_load(resource_instance_meta)
-    assert not resource_instance_yaml.has_key('apptye')
+    assert 'apptype' not in resource_instance_yaml
     resource_instance_config = LainConf()
     resource_instance_config.load(resource_instance_meta,
                                   resource_meta_version,
