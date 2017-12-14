@@ -111,7 +111,7 @@ def meta_version(repo_dir, sha1=''):
         warn('Error getting cd Git commit hash: {}'.format(e.output))
         return None
 
-    return commit_hash
+    return commit_hash.decode()
 
 
 REGISTRY_CONNECT_TIMEOUT = 3
