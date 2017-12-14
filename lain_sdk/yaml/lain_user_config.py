@@ -50,7 +50,7 @@ class LainUserConfig:
 
     def ensure_config_path(self):
         if not os.path.exists(self.config_path):
-            os.makedirs(self.config_path, 0700)
+            os.makedirs(self.config_path, 0o700)
 
     def set_config(self, **kwargs):
         _config = self.get_config_from(self.user_config_file)
