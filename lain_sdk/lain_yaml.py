@@ -11,7 +11,7 @@ import tempfile
 from .yaml.util import load_template
 from .yaml.conf import DOCKER_APP_ROOT, PRIVATE_REGISTRY, user_config
 from .yaml.parser import LainConf
-import mydocker
+from . import mydocker
 from .util import (error, warn, info, mkdir_p, rm, file_parent_dir,
                    meta_version)
 from subprocess import call
@@ -323,7 +323,7 @@ class LainYaml(object):
             'scripts': self.test.script
         }
         test_name = self.img_builders['test'](context=self.ctx, params=params, build_args=[])
-      
+
         if test_name is None:
             error("Tests Fail")
             return (False, None)
