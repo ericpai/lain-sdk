@@ -3,6 +3,7 @@
 from __future__ import print_function
 from six import iteritems
 import os
+import time
 import shutil
 import tempfile
 import requests
@@ -163,6 +164,22 @@ def remove_container(container_id, kill=True):
     if kill:
         _docker(['kill', container_id])
     _docker(['rm', '-f', container_id], print_stdout=False)
+
+
+def copy_file_from_container(container_name, file):
+    try:
+        info('copied {} from test image...'.format(file))
+        cp(container_name, file)
+    except Exception:
+        error('fail to copy {} from test image...'.format(file))
+
+
+def copy_files_from_image(image, files):
+    container_name = 'tmp_{}'.format(int(time.time()))
+    create(container_name, image)
+    for f in files:
+        copy_file_from_container(container_name, f)
+    remove_container(container_name, kill=False)
 
 
 def copy_to_host(image_name, docker_path, host_path, directory=False):
