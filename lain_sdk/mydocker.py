@@ -9,8 +9,9 @@ import requests
 import subprocess
 import docker
 from jinja2 import Template
+from .yaml.conf import DOCKER_APP_ROOT
 from .util import (info, error,
-                   recur_create_file, rm,
+                   recur_create_file, rm, mkdir_p,
                    parse_registry_auth, get_jwt_for_registry,
                    REGISTRY_CONNECT_TIMEOUT, REGISTRY_READ_TIMEOUT)
 
@@ -157,10 +158,11 @@ def get_latest_container_id():
     return container_id
 
 
-def remove_container(container_id):
+def remove_container(container_id, kill=True):
     info('removing container {} ...'.format(container_id))
-    _docker(['kill', container_id])
-    _docker(['rm', '-f', container_id])
+    if kill:
+        _docker(['kill', container_id])
+    _docker(['rm', '-f', container_id], print_stdout=False)
 
 
 def copy_to_host(image_name, docker_path, host_path, directory=False):
@@ -231,35 +233,33 @@ def enter(name):
     _docker(['run', '-it', name, '/bin/bash'])
 
 
-def proc_run(container_name, image, working_dir, port, cmd, envs, volumes):
-    info('run proc {} with image {}'.format(container_name, image))
-    working_dir_opt = ['-w', working_dir] if working_dir else []
-    port_opt = ['-p', str(port)] if port else []
-    env_opt = sum([['-e', env] for env in envs], [])
-    volume_opt = sum([
-        ['-v', '{}:{}'.format(k, v)]
-        for (k, v) in iteritems(volumes)
-    ], [])
-    docker_args = ['run', '-d', '--name={}'.format(container_name)] \
-        + working_dir_opt + port_opt + env_opt + volume_opt + [image] + cmd
-    _docker(docker_args)
+def create(container_name, image, cmd="bash"):
+    output = _docker(['create', '--name', container_name, image, cmd], capture_output=True)
+    info(output)
 
 
-def proc_debug(container_name):
-    info('attach proc instance {}'.format(container_name))
-    _docker(['exec', '-it', container_name, 'bash'])
+def cp(container_name, file):
+    '''
+    file: relative to working_dir
+    '''
+    f = file.strip().rstrip('/')
+    local_path = os.path.dirname(f)
+    if local_path.startswith('/') or local_path.startswith('.'):
+        error('invalid file path')
+        return
+    if local_path:
+        mkdir_p(local_path)
 
+    output = _docker(
+        [
+            'cp',
+            '{}:/lain/app/{}'.format(container_name, f),
+            './{}'.format(f)
+        ],
+        capture_output=True
+    )
 
-def proc_stop(container_name):
-    info('stop proc instance {}'.format(container_name))
-    _docker(['stop', container_name])
-
-
-def proc_rm(container_name, host_volume_base):
-    info('rm proc instance {}'.format(container_name))
-    _docker(['rm', '-v', container_name])
-    info('rm proc instance volume at host: {}'.format(host_volume_base))
-    subprocess.call(['rm', '-rf', host_volume_base])
+    info(output)
 
 
 def inspect(container_name):
